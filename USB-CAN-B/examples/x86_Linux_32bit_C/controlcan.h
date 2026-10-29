@@ -1,8 +1,8 @@
 #ifndef CONTROLCAN_H
 #define CONTROLCAN_H
 
-////文件版本：v2.02 20190609
-//接口卡类型定义
+////File version: v2.02 20190609
+//Interface card type definition
 
 #define VCI_USBCAN1		3
 #define VCI_USBCAN2		4
@@ -11,7 +11,7 @@
 #define VCI_USBCAN_E_U 		20
 #define VCI_USBCAN_2E_U 	21
 
-//函数调用返回状态值
+//Function call returns status value
 #define	STATUS_OK					1
 #define STATUS_ERR					0
 	
@@ -30,7 +30,7 @@
 #define TRUE 1
 #define FALSE 0
 
-//1.ZLGCAN系列接口卡信息的数据类型。
+//1. Data type of ZLGCAN series interface card information.
 typedef  struct  _VCI_BOARD_INFO{
 		USHORT	hw_Version;
 		USHORT	fw_Version;
@@ -43,20 +43,20 @@ typedef  struct  _VCI_BOARD_INFO{
 		USHORT	Reserved[4];
 } VCI_BOARD_INFO,*PVCI_BOARD_INFO; 
 
-//2.定义CAN信息帧的数据类型。
+//2. Define the data type of CAN information frame.
 typedef  struct  _VCI_CAN_OBJ{
 	UINT	ID;
 	UINT	TimeStamp;
 	BYTE	TimeFlag;
 	BYTE	SendType;
-	BYTE	RemoteFlag;//是否是远程帧
-	BYTE	ExternFlag;//是否是扩展帧
+	BYTE	RemoteFlag;//Whether it is a remote frame
+	BYTE	ExternFlag;//Whether it is an extended frame
 	BYTE	DataLen;
 	BYTE	Data[8];
 	BYTE	Reserved[3];
 }VCI_CAN_OBJ,*PVCI_CAN_OBJ;
 
-//3.定义初始化CAN的数据类型
+//3. Define the data type of initialized CAN
 typedef struct _INIT_CONFIG{
 	DWORD	AccCode;
 	DWORD	AccMask;
@@ -67,9 +67,9 @@ typedef struct _INIT_CONFIG{
 	UCHAR	Mode;
 }VCI_INIT_CONFIG,*PVCI_INIT_CONFIG;
 
-///////// new add struct for filter /////////
+/////////new add struct for filter /////////
 typedef struct _VCI_FILTER_RECORD{
-	DWORD ExtFrame;	//是否为扩展帧
+	DWORD ExtFrame;//Whether it is an extended frame
 	DWORD Start;
 	DWORD End;
 }VCI_FILTER_RECORD,*PVCI_FILTER_RECORD;

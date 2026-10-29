@@ -1,5 +1,5 @@
-//样例只是提供一个简单的调用so库的方法供参考，程序接收，与发送函数设置在两个线程中，并且线程没有同步。
-//现实中客户编程中，发送与接收函数不能同时调用（不支持多线程），如果在多线程中，一定需要互锁。需要客户自行完善代码。
+//The sample only provides a simple method of calling the so library for reference. The program receiving and sending functions are set in two threads, and the threads are not synchronized.
+//In actual customer programming, the sending and receiving functions cannot be called at the same time (multi-threading is not supported). If in multi-threading, interlocking must be required. Customers need to improve the code themselves.
 
 
 
@@ -15,50 +15,50 @@
 #include <cstdlib>
 #include "unistd.h"
 
-VCI_BOARD_INFO pInfo;//用来获取设备信息。
-int count=0;//数据列表中，用来存储列表序号。
+VCI_BOARD_INFO pInfo;//Used to obtain device information.
+int count=0;//In the data list, used to store the list sequence number.
 VCI_BOARD_INFO pInfo1 [50];
 int num=0;
-void *receive_func(void* param)  //接收线程。
+void *receive_func(void* param)//Receive thread.
 {
 	int reclen=0;
-	VCI_CAN_OBJ rec[3000];//接收缓存，设为3000为佳。
+	VCI_CAN_OBJ rec[3000];//Receive buffer, preferably set to 3000.
 	int i,j;
 	
-	int *run=(int*)param;//线程启动，退出控制。
+	int *run=(int*)param;//Thread starts and exits control.
     int ind=0;
 	
 	while((*run)&0x0f)
 	{
-		if((reclen=VCI_Receive(VCI_USBCAN2,0,ind,rec,3000,100))>0)//调用接收函数，如果有数据，进行数据处理显示。
+		if((reclen=VCI_Receive(VCI_USBCAN2,0,ind,rec,3000,100))>0)//Call the receiving function. If there is data, perform data processing and display.
 		{
 			for(j=0;j<reclen;j++)
 			{
-				printf("Index:%04d  ",count);count++;//序号递增
+				printf("Index:%04d  ",count);count++;//increment the serial number
 				printf("CAN%d RX ID:0x%08X", ind+1, rec[j].ID);//ID
-				if(rec[j].ExternFlag==0) printf(" Standard ");//帧格式：标准帧
-				if(rec[j].ExternFlag==1) printf(" Extend   ");//帧格式：扩展帧
-				if(rec[j].RemoteFlag==0) printf(" Data   ");//帧类型：数据帧
-				if(rec[j].RemoteFlag==1) printf(" Remote ");//帧类型：远程帧
-				printf("DLC:0x%02X",rec[j].DataLen);//帧长度
-				printf(" data:0x");	//数据
+				if(rec[j].ExternFlag==0) printf(" Standard ");//Frame format: standard frame
+				if(rec[j].ExternFlag==1) printf(" Extend   ");//Frame format: extended frame
+				if(rec[j].RemoteFlag==0) printf(" Data   ");//Frame type: data frame
+				if(rec[j].RemoteFlag==1) printf(" Remote ");//Frame type: remote frame
+				printf("DLC:0x%02X",rec[j].DataLen);//frame length
+				printf(" data:0x");//data
 				for(i = 0; i < rec[j].DataLen; i++)
 				{
 					printf(" %02X", rec[j].Data[i]);
 				}
-				printf(" TimeStamp:0x%08X",rec[j].TimeStamp);//时间标识。
+				printf(" TimeStamp:0x%08X",rec[j].TimeStamp);//Time stamp.
 				printf("\n");
 			}
 		}
-		ind=!ind;//变换通道号，以便下次读取另一通道，交替读取。		
+		ind=!ind;//Change the channel number so that another channel can be read next time and read alternately.
 	}
-	printf("run thread exit\n");//退出接收线程	
+	printf("run thread exit\n");//Exit the receiving thread
 	pthread_exit(0);
 }
 
 main()
 {
-	printf(">>this is hello !\r\n");//指示程序已运行
+	printf(">>this is hello !\r\n");//Indicates that the program is running
 
 	num=VCI_FindUsbDevice2(pInfo1);
 
@@ -111,19 +111,19 @@ main()
 	printf(">>\n");
 	printf(">>\n");
 	printf(">>\n");
-	if(VCI_OpenDevice(VCI_USBCAN2,0,0)==1)//打开设备
+	if(VCI_OpenDevice(VCI_USBCAN2,0,0)==1)//Open the device
 	{
-		printf(">>open deivce success!\n");//打开设备成功
+		printf(">>open deivce success!\n");//Open device successfully
 	}else
 	{
 		printf(">>open deivce error!\n");
 		exit(1);
 	}
-	if(VCI_ReadBoardInfo(VCI_USBCAN2,0,&pInfo)==1)//读取设备序列号、版本等信息。
+	if(VCI_ReadBoardInfo(VCI_USBCAN2,0,&pInfo)==1)//Read device serial number, version and other information.
 	{
                 printf(">>Get VCI_ReadBoardInfo success!\n");
 		
-		//printf(" %08X", pInfo.hw_Version);printf("\n");
+//printf(" %08X", pInfo.hw_Version);printf("\n");
 		//printf(" %08X", pInfo.fw_Version);printf("\n");
 		//printf(" %08X", pInfo.dr_Version);printf("\n");
 		//printf(" %08X", pInfo.in_Version);printf("\n");
@@ -173,14 +173,14 @@ main()
 		exit(1);
 	}
 
-	//初始化参数，严格参数二次开发函数库说明书。
+//Initialization parameters, strict parameter secondary development function library instructions.
 	VCI_INIT_CONFIG config;
 	config.AccCode=0;
 	config.AccMask=0xFFFFFFFF;
-	config.Filter=1;//接收所有帧
-	config.Timing0=0x03;/*波特率125 Kbps  0x03  0x1C*/
+	config.Filter=1;//Receive all frames
+	config.Timing0=0x03;/*Baud rate 125 Kbps 0x03 0x1C*/
 	config.Timing1=0x1C;
-	config.Mode=0;//正常模式		
+	config.Mode=0;//normal mode
 	
 	if(VCI_InitCAN(VCI_USBCAN2,0,0,&config)!=1)
 	{
@@ -207,7 +207,7 @@ main()
 		VCI_CloseDevice(VCI_USBCAN2,0);
 
 	}
-	//需要发送的帧，结构体设置
+//Frames to be sent, structure settings
 	VCI_CAN_OBJ send[1];
 	send[0].ID=0;
 	send[0].SendType=0;
@@ -272,15 +272,15 @@ main()
 		}
 		else	break;
 	}
-	usleep(10000000);//延时单位us，这里设置 10 000 000=10s    10s后关闭接收线程，并退出主程序。
-	m_run0=0;//线程关闭指令。
-	pthread_join(threadid,NULL);//等待线程关闭。
-	usleep(100000);//延时100ms。
-	VCI_ResetCAN(VCI_USBCAN2, 0, 0);//复位CAN1通道。
-	usleep(100000);//延时100ms。
-	VCI_ResetCAN(VCI_USBCAN2, 0, 1);//复位CAN2通道。
-	usleep(100000);//延时100ms。
-	VCI_CloseDevice(VCI_USBCAN2,0);//关闭设备。
-	//除收发函数外，其它的函数调用前后，最好加个毫秒级的延时，即不影响程序的运行，又可以让USBCAN设备有充分的时间处理指令。
+	usleep(10000000);//Delay unit us, set here to 10 000 000 = 10s. After 10s, close the receiving thread and exit the main program.
+	m_run0=0;//Thread shutdown instruction.
+	pthread_join(threadid,NULL);//Wait for the thread to close.
+	usleep(100000);//Delay 100ms.
+	VCI_ResetCAN(VCI_USBCAN2, 0, 0);//Reset CAN1 channel.
+	usleep(100000);//Delay 100ms.
+	VCI_ResetCAN(VCI_USBCAN2, 0, 1);//Reset CAN2 channel.
+	usleep(100000);//Delay 100ms.
+	VCI_CloseDevice(VCI_USBCAN2,0);//Shut down the device.
+	//Except for the sending and receiving functions, it is best to add a millisecond delay before and after calling other functions, which will not affect the running of the program and allow the USBCAN device to have sufficient time to process instructions.
 	//goto ext;
 }
